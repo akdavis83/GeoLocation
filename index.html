@@ -61,15 +61,34 @@
   </style>
   <script>
     const arrow = document.querySelector('.arrow');
-    const speed = document.querySelector('.speed-value');
-
-    navigator.geolocation.watchPosition((data) => {
-      console.log(data);
-      speed.textContent = data.coords.speed;
-      arrow.style.transform = `rotate(${data.coords.heading}deg)`;
-    }, (err) => {
-      console.error(err);
-    });
+    const speedValue = document.querySelector('.speed-value');
+  
+    // Check if geolocation is supported
+    if ('geolocation' in navigator) {
+      navigator.geolocation.watchPosition(
+        (position) => {
+          console.log(position);
+          const speed = position.coords.speed;
+          const heading = position.coords.heading;
+  
+          // Update speed value
+          speedValue.textContent = `${speed.toFixed(2)} km/h`;
+  
+          // Update arrow direction
+          arrow.style.transform = `rotate(${heading}deg)`;
+        },
+        (error) => {
+          console.error(`Error: ${error.message}`);
+        },
+        {
+          enableHighAccuracy: true, // Request high accuracy
+          timeout: 5000, // Timeout after 5 seconds
+          maximumAge: 0 // Do not use cached positions
+        }
+      );
+    } else {
+      console.error('Geolocation is not supported in this browser');
+    }
   </script>
 </body>
 </html>
